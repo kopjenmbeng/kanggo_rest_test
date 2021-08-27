@@ -12,6 +12,7 @@ import (
 type IOrderUseCase interface {
 	Create(ctx context.Context, req CreateOrderRequest) (status int, err error)
 	UpdatePayment(ctx context.Context, req PaidOrderRequest) (status int, err error)
+	GetMyOrder(ctx context.Context) (result []dto.MyOrder, status int, err error)
 }
 
 type OrderUseCase struct {
@@ -22,7 +23,14 @@ type OrderUseCase struct {
 func NewOrderUserCase(repo IOrderRepository, r *http.Request) IOrderUseCase {
 	return &OrderUseCase{repository: repo, r: r}
 }
-
+func(use_case *OrderUseCase)GetMyOrder(ctx context.Context) (result[]dto.MyOrder, status int, err error){
+	claim := jwe_auth.GetClaims(use_case.r)
+	result, status, err = use_case.repository.GetOrder(ctx, claim.Public.Subject)
+	if err != nil {
+		return
+	}
+	return
+}
 func (use_case *OrderUseCase) Create(ctx context.Context, req CreateOrderRequest) (status int, err error) {
 	claim := jwe_auth.GetClaims(use_case.r)
 	order := dto.Order{OrderId: uuid.New().String(), Status: "Pending",ProductId: req.ProductId,UserId: claim.Public.Subject,Qty: req.Qty}

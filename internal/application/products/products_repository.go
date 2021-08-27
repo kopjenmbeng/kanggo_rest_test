@@ -70,6 +70,7 @@ func (repo *ProductsRepository) FindAll(ctx context.Context) (result []dto.Produ
 		FROM tbl_product;
 	`)
 	rows, err := repo.dbr.QueryContext(ctx, query)
+	defer rows.Close()
 	if err != nil {
 		status = http.StatusInternalServerError
 		return

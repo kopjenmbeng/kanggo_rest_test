@@ -13,7 +13,8 @@ import (
 
 type IOrderRepository interface {
 	Create(ctx context.Context, odr dto.Order) (status int, err error)
-	UpdatePayment(ctx context.Context,order dto.Order)(status int, err error)
+	UpdatePayment(ctx context.Context, order dto.Order) (status int, err error)
+	GetOrder(ctx context.Context, user_id string) (result []dto.MyOrder, status int, err error)
 }
 
 type OrderRepository struct {
@@ -24,22 +25,48 @@ type OrderRepository struct {
 func NewOrderRepository(dbr sqlx.QueryerContext, dbw *sqlx.DB) IOrderRepository {
 	return &OrderRepository{dbr: dbr, dbw: dbw}
 }
+func (repo *OrderRepository) GetOrder(ctx context.Context, user_id string) (result []dto.MyOrder, status int, err error) {
+	query := fmt.Sprintf(`
+	SELECT order_id,product_id,b.name as product,a.qty,amount,status
+	FROM tbl_order a inner join
+	tbl_product b on b.id=a.product_id
+	where a.user_id=?
+	`)
 
-func(repo *OrderRepository)UpdatePayment(ctx context.Context,order dto.Order)(status int, err error){
-	query:=fmt.Sprintf(`
+	rows, err := repo.dbr.QueryContext(ctx, query, &user_id)
+	defer rows.Close()
+	if err != nil {
+		status = http.StatusInternalServerError
+		return
+	}
+	for rows.Next() {
+		var order dto.MyOrder
+		err = rows.Scan(&order.OrderId, &order.ProductId, &order.ProductName, &order.Qty, &order.Amount, &order.Status)
+		if err != nil {
+			status = http.StatusInternalServerError
+			return
+		}
+		result = append(result, order)
+	}
+	status = http.StatusOK
+	return
+}
+
+func (repo *OrderRepository) UpdatePayment(ctx context.Context, order dto.Order) (status int, err error) {
+	query := fmt.Sprintf(`
 	UPDATE tbl_order
 	set status=?
 	where order_id=? and user_id=?
 	`)
-	save,err:=repo.dbw.ExecContext(ctx,query,&order.Status,&order.OrderId,order.UserId)
+	save, err := repo.dbw.ExecContext(ctx, query, &order.Status, &order.OrderId, order.UserId)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
-	affect,err:=save.RowsAffected()
-	if affect==0 {
-		return http.StatusBadRequest,errors.New("tidak ada pembayaran yang di update !")
+	affect, err := save.RowsAffected()
+	if affect == 0 {
+		return http.StatusBadRequest, errors.New("tidak ada pembayaran yang di update !")
 	}
-	status=http.StatusOK
+	status = http.StatusOK
 	return
 
 }
@@ -65,7 +92,7 @@ func (repo *OrderRepository) Create(ctx context.Context, odr dto.Order) (status 
 	}
 
 	// create order
-	odr.Amount=product.Price*float64(odr.Qty)
+	odr.Amount = product.Price * float64(odr.Qty)
 	_, err = tx.ExecContext(ctx, query,
 		&odr.OrderId,
 		&odr.UserId,

@@ -20,6 +20,7 @@ func Routes() *chi.Mux {
 		r.Use(InjectUseCaseContext)
 		r.Post("/add", CreateOrderHandler)
 		r.Put("/pay", UpdatePaymentHandler)
+		r.Get("/my_order", GetMyOrderHandler)
 		// r.Delete("/delete/{chart_id}",DeleteChartHandler)
 	})
 	return r
