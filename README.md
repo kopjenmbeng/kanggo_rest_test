@@ -11,7 +11,7 @@ Services ini dibuat untuk soal berikut ![klik disini untuk melihat soal](../mast
 # Sebelum RUN
 Silahkan restore database berikut ![klik untuk download](../master/script/kanggo_db.sql)
 
--   pastikan .env file ini ada and the konfigurasinya seperti ini.
+-   pastikan .env file ini ada dan konfigurasinya seperti ini.
     # predefined goconf env vars
     - GOCONF_ENV_PREFIX=kanggo
     - #GOCONF_CONSUL=localhost:8500 (please remark using # if you don't have consul so it will read ![this json config](../master/kanggo.config.json))
