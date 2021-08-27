@@ -19,7 +19,7 @@ func Routes() *chi.Mux {
 		r.Use(jwe_auth.GuardAnonymous(jwe_auth.TokenFromHeader))
 		r.Use(InjectUseCaseContext)
 		r.Post("/add", CreateOrderHandler)
-		// r.Put("/update", UpdateChartHandler)
+		r.Put("/pay", UpdatePaymentHandler)
 		// r.Delete("/delete/{chart_id}",DeleteChartHandler)
 	})
 	return r

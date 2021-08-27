@@ -12,8 +12,8 @@ import (
 )
 
 type IAuthenticationRepository interface {
-	GetUser(ctx context.Context, email string) (data *dto.Customer, status int, Err error)
-	Register(ctx context.Context, customer dto.Customer) (status int, err error)
+	GetUser(ctx context.Context, email string) (data *dto.User, status int, Err error)
+	Register(ctx context.Context, customer dto.User) (status int, err error)
 }
 
 type AuthenticationRepository struct {
@@ -43,7 +43,7 @@ func (repo *AuthenticationRepository) IsDuplicateEmail(ctx context.Context, emai
 	return false, nil
 
 }
-func (repo *AuthenticationRepository) Register(ctx context.Context, customer dto.Customer) (status int, err error) {
+func (repo *AuthenticationRepository) Register(ctx context.Context, customer dto.User) (status int, err error) {
 
 	query := fmt.Sprintf(`
 	INSERT INTO tbl_user(
@@ -75,13 +75,13 @@ func (repo *AuthenticationRepository) Register(ctx context.Context, customer dto
 	status = http.StatusCreated
 	return
 }
-func (repo *AuthenticationRepository) GetUser(ctx context.Context, email string) (data *dto.Customer, status int, Err error) {
+func (repo *AuthenticationRepository) GetUser(ctx context.Context, email string) (data *dto.User, status int, Err error) {
 	query := fmt.Sprintf(`
 	SELECT id, email, full_name, salt, password, iteration, security_length
 	FROM tbl_user where email=? limit 1
 	`)
 
-	var cus dto.Customer
+	var cus dto.User
 	err := repo.dbr.QueryRowxContext(ctx, query, &email).Scan(&cus.Id, &email, &cus.FullName, &cus.Salt, &cus.Password, &cus.Iteration, &cus.SecurityLength)
 	if err != nil {
 		if err == sql.ErrNoRows {

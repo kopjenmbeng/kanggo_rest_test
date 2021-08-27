@@ -31,7 +31,7 @@ func (use_case *AuthenticationUseCase) Register(ctx context.Context, req Registe
 	iteration := middleware.GenerateRandomNumber(900, 999)
 	secLength := middleware.GenerateRandomNumber(32, 64)
 	password := middleware.HashPassword(req.Password, salt, iteration, secLength)
-	cus := dto.Customer{Id: uuid.New().String(), Email: req.Email, FullName: req.FullName, Salt: salt, Password: password, Iteration: iteration, SecurityLength: secLength}
+	cus := dto.User{Id: uuid.New().String(), Email: req.Email, FullName: req.FullName, Salt: salt, Password: password, Iteration: iteration, SecurityLength: secLength}
 	status, err = use_case.repository.Register(ctx, cus)
 	return
 }

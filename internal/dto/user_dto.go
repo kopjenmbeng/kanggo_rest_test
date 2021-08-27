@@ -1,6 +1,6 @@
 package dto
 
-type Customer struct {
+type User struct {
 	Id             string
 	Email          string
 	FullName       string

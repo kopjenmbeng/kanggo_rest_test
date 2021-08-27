@@ -1,14 +1,10 @@
 package dto
 
-import "time"
-
 type Order struct {
 	OrderId   string
+	UserId    string
+	ProductId string
+	Qty       int
+	Amount    float64
 	Status    string
-	CreatedAt time.Time
-	CreatedBy string
-	UpdatedAt time.Time
-	UpdatedBy string
-	DeletedAt time.Time
-	DeletedBy string
 }
