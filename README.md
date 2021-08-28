@@ -27,7 +27,7 @@ setelah memenuhi permintaan diatas ,berikut cara menjalankan service ini secara 
 -   for Api documentation silahkan import ![api doc](../master/document/kanggo.postman_collection.json))
 
 -   untuk mencoba api ini secara publik silahkan gunakan base url berikut.
-    -   kanggo-api.slametsupriyadi.com
+    -   http://kanggo-api.slametsupriyadi.com
 
 
 Feel free for ask
