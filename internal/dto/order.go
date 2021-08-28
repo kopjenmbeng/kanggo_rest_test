@@ -11,7 +11,6 @@ type Order struct {
 
 type MyOrder struct {
 	OrderId     string
-	UserId      string
 	ProductId   string
 	ProductName string
 	Qty         int

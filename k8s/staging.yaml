@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kanggo-rest-staging
+  namespace: staging
+  labels:
+    name: kanggo-rest-staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: kanggo-rest-staging
+  template:
+    metadata:
+      annotations:
+        config.linkerd.io/skip-inbound-ports: 4222,8222
+        config.linkerd.io/skip-outbound-ports: 4222,8222
+        linkerd.io/inject: enabled
+      name: kanggo-rest-staging
+      labels:
+        name: kanggo-rest-staging
+    spec:
+      # hostNetwork: true
+      containers:
+        - name: kanggo-rest-staging
+          image: kopjenmbeng/kanggo_rest_test:staging
+          imagePullPolicy: Always
+          env:
+            - name: GOCONF_CONSUL
+              value: consul-consul-ui.consul.svc.cluster.local
+            - name: GOCONF_FILENAME
+              value: kanggo.config
+            - name: GOCONF_TYPE
+              value: json
+
+          ports:
+            - containerPort: 8080
+
+          command: ["/go/bin/app"]
+          args: ["api"]
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 10m
+              memory: 64Mi
+      nodeSelector:
+        ctienv: "jenkins"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kanggo-rest-services-staging
+  namespace: staging
+spec:
+  selector:
+    name: kanggo-rest-staging
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: koala-listing-web-ingress
+  namespace: staging
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/rewrite-target: /
+    # nginx.ingress.kubernetes.io/default-backend: nginx-ingress
+  labels:
+    name: nginx-ingress
+spec:
+  rules:
+    - host: kanggo-api.slametsupriyadi.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: kanggo-rest-services-staging
+              servicePort: 8080
