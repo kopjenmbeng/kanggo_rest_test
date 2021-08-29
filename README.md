@@ -4,7 +4,7 @@ Services ini dibuat untuk soal berikut ![klik disini untuk melihat soal](../mast
 
 # Technology Stack
 -   GO
--   Postgres
+-   MySql
 -   Consul untuk store configuration (Optional)
 -   Postman untuk API Documentation
 
